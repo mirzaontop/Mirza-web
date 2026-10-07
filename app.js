@@ -15,9 +15,10 @@ function render(state){
   $("#connectionPill").innerHTML = `<i></i>${online ? "Connected" : state.connecting ? "Connecting" : "Disconnected"}`;
   $("#botToggle").checked = state.autoReply;
 
-  const qr = $("#qr"), empty = $("#qrEmpty");
-  if(state.qr){ qr.src = state.qr; qr.style.display = "block"; empty.style.display = "none"; }
-  else { qr.removeAttribute("src"); qr.style.display = "none"; empty.style.display = "block"; }
+  const qr = $("#qr"), empty = $("#qrEmpty"), pairingBox = $("#pairingBox");
+  if(state.qr){ qr.src = state.qr; qr.style.display = "block"; empty.style.display = "none"; pairingBox.style.display = "none"; }
+  else if(state.pairingCode){ qr.removeAttribute("src"); qr.style.display = "none"; pairingBox.style.display = "flex"; empty.style.display = "none"; $("#pairingCode").textContent = state.pairingCode; }
+  else { qr.removeAttribute("src"); qr.style.display = "none"; pairingBox.style.display = "none"; empty.style.display = "block"; }
 
   $("#messages").innerHTML = state.messages.slice().reverse().map(m =>
     `<div class="message"><b>${esc(m.from)}</b><small>${new Date(m.timestamp).toLocaleTimeString()}</small><div>${esc(m.text || "[media]")}</div></div>`
@@ -46,6 +47,14 @@ socket.on("message", () => api("/api/state").then(render));
 socket.on("log", () => api("/api/state").then(render));
 
 $("#connectBtn").onclick = () => api("/api/connect",{method:"POST"});
+$("#pairingBtn").onclick = async () => {
+  const phone = $("#pairingPhone").value.trim().replace(/\D/g, "");
+  if(!phone) return alert("Enter your WhatsApp number with country code, e.g. 923001234567");
+  try {
+    const data = await api("/api/pairing-code",{method:"POST",body:JSON.stringify({phone})});
+    if(data.pairingCode) $("#pairingCode").textContent = data.pairingCode;
+  } catch(err){ alert(err.message); }
+};
 $("#refreshBtn").onclick = () => api("/api/connect",{method:"POST"});
 $("#disconnectBtn").onclick = () => api("/api/disconnect",{method:"POST"});
 $("#restartBtn").onclick = async () => { await api("/api/disconnect",{method:"POST"}); setTimeout(()=>api("/api/connect",{method:"POST"}),500); };

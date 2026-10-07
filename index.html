@@ -45,12 +45,21 @@
           <article class="panel connection">
             <div class="panel-head"><div><h2>WhatsApp Connection</h2><p>Scan the QR code to connect your account.</p></div><button class="icon" id="refreshBtn">↻</button></div>
             <div class="connect-body">
-              <div class="qr-wrap"><img id="qr" alt="WhatsApp QR"><span id="qrEmpty">QR will appear here</span></div>
+              <div class="qr-wrap">
+                <img id="qr" alt="WhatsApp QR">
+                <div id="pairingBox" style="display:none">
+                  <strong id="pairingCode">----</strong>
+                  <small>On WhatsApp: Linked devices → Link a device → Link with phone number instead</small>
+                </div>
+                <span id="qrEmpty">Choose a login method below</span>
+              </div>
               <div class="connect-info">
                 <div class="pill" id="connectionPill"><i></i> Disconnected</div>
                 <p>Phone: <b id="phone">—</b></p>
                 <p>Session: <b id="session">Not connected</b></p>
-                <button class="primary" id="connectBtn">Connect WhatsApp</button>
+                <input id="pairingPhone" inputmode="numeric" placeholder="923001234567">
+                <button class="primary" id="pairingBtn">Get Pairing Code</button>
+                <button class="secondary" id="connectBtn">Use QR Code</button>
                 <button class="danger" id="disconnectBtn">Disconnect</button>
               </div>
             </div>
