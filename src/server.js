@@ -361,7 +361,7 @@ sock = makeWASocket({
   version,
   auth: authState,
   logger: pino({ level: "silent" }),
-  browser: ["LemonLeek Panel", "Chrome", "1.0.0"],
+  browser: ["Mac OS", "Chrome", "1.0.0"],
   markOnlineOnConnect: false,
   generateHighQualityLinkPreview: false
 });
