@@ -113,3 +113,30 @@ body {
   50% { background-position: 100% 100%; }
   100% { background-position: 0% 0%; }
 }
+/* LIVE STATUS BADGE */
+.online {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.online i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #00ff88;
+  box-shadow: 0 0 12px #00ff88;
+  animation: statusPulse 1.5s infinite;
+}
+
+@keyframes statusPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: .45;
+    transform: scale(1.35);
+  }
+  }
