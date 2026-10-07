@@ -93,3 +93,29 @@ $("#botToggle").onchange = e => api("/api/settings",{method:"PATCH",body:JSON.st
 $("#autoReply").onchange = e => $("#botToggle").checked = e.target.checked;
 
 api("/api/state").then(render);
+// LIVE CLOCK
+const clock = document.createElement("div");
+clock.id = "liveClock";
+clock.style.cssText = `
+  position:fixed;
+  right:15px;
+  bottom:15px;
+  padding:10px 14px;
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:14px;
+  background:rgba(5,20,35,.75);
+  backdrop-filter:blur(12px);
+  color:#fff;
+  font-size:13px;
+  font-weight:700;
+  z-index:9999;
+  box-shadow:0 8px 25px rgba(0,0,0,.25);
+`;
+document.body.appendChild(clock);
+
+function updateClock(){
+  clock.textContent = "🕒 " + new Date().toLocaleTimeString();
+}
+
+updateClock();
+setInterval(updateClock, 1000);
