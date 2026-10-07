@@ -368,29 +368,7 @@ sock = makeWASocket({
 
 sock.ev.on("creds.update", saveCreds);
 
-if (
-  state.loginMode === "pairing" &&
-  state.pairingPhone &&
-  !authState.creds.registered
-) {
-  setTimeout(async () => {
-    try {
-      const code = await sock.requestPairingCode(state.pairingPhone);
 
-      state.pairingCode =
-        String(code || "").match(/.{1,4}/g)?.join("-") ||
-        String(code || "");
-
-      state.connecting = true;
-      log("success", "WhatsApp pairing code generated");
-      io.emit("state", snapshot());
-    } catch (err) {
-      state.pairingCode = null;
-      log("error", `Pairing code failed: ${err.message}`);
-      io.emit("state", snapshot());
-    }
-  }, 2000);
-}
 
 sock.ev.on("connection.update", async (update) => {
   const { connection, lastDisconnect, qr } = update;
@@ -401,7 +379,23 @@ sock.ev.on("connection.update", async (update) => {
   hasQr: Boolean(qr)
 });
 
-  if (qr && state.loginMode === "qr") {
+  if (qr && !authState.creds.registered) {
+  if (state.loginMode === "pairing" && state.pairingPhone) {
+    try {
+      const code = await sock.requestPairingCode(state.pairingPhone);
+
+      state.pairingCode =
+        String(code || "").match(/.{1,4}/g)?.join("-") ||
+        String(code || "");
+
+      log("success", "WhatsApp pairing code generated");
+      io.emit("state", snapshot());
+    } catch (err) {
+      state.pairingCode = null;
+      log("error", `Pairing code failed: ${err.message}`);
+      io.emit("state", snapshot());
+    }
+  } else if (state.loginMode === "qr") {
     state.qr = await QRCode.toDataURL(qr, {
       margin: 1,
       width: 320
@@ -410,6 +404,7 @@ sock.ev.on("connection.update", async (update) => {
     log("info", "New WhatsApp QR generated");
     io.emit("state", snapshot());
   }
+}
 
   if (connection === "open") {
     state.connected = true;
