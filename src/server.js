@@ -357,7 +357,7 @@ async function startWhatsApp(options = {}) {
     const { state: authState, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
     const { version } = await fetchLatestWaWebVersion();
 
-    sock = makeWASocket({
+sock = makeWASocket({
   version,
   auth: authState,
   logger: pino({ level: "silent" }),
@@ -368,15 +368,12 @@ async function startWhatsApp(options = {}) {
 
 sock.ev.on("creds.update", saveCreds);
 
-sock.ev.on("connection.update", async (update) => {
-  const { connection, lastDisconnect, qr } = update;
-
-  if (
-    state.loginMode === "pairing" &&
-    state.pairingPhone &&
-    !authState.creds.registered &&
-    (connection === "connecting" || qr)
-  ) {
+if (
+  state.loginMode === "pairing" &&
+  state.pairingPhone &&
+  !authState.creds.registered
+) {
+  setTimeout(async () => {
     try {
       const code = await sock.requestPairingCode(state.pairingPhone);
 
@@ -392,7 +389,11 @@ sock.ev.on("connection.update", async (update) => {
       log("error", `Pairing code failed: ${err.message}`);
       io.emit("state", snapshot());
     }
-  }
+  }, 2000);
+}
+
+sock.ev.on("connection.update", async (update) => {
+  const { connection, lastDisconnect, qr } = update;
 
   if (qr && state.loginMode === "qr") {
     state.qr = await QRCode.toDataURL(qr, {
@@ -404,34 +405,45 @@ sock.ev.on("connection.update", async (update) => {
     io.emit("state", snapshot());
   }
 
-      if (connection === "open") {
-        state.connected = true;
-        state.connecting = false;
-        state.qr = null;
-        state.pairingCode = null;
-        state.phone = sock.user?.id?.split(":")[0] || null;
-        log("success", "WhatsApp connection established", { phone: state.phone });
-        io.emit("state", snapshot());
-      }
+  if (connection === "open") {
+    state.connected = true;
+    state.connecting = false;
+    state.qr = null;
+    state.pairingCode = null;
+    state.phone = sock.user?.id?.split(":")[0] || null;
 
-      if (connection === "close") {
-        state.connected = false;
-        state.connecting = false;
-        const code = lastDisconnect?.error?.output?.statusCode;
-        const loggedOut = code === DisconnectReason.loggedOut;
-
-        log("warn", loggedOut ? "WhatsApp session logged out" : "WhatsApp connection closed", { code });
-
-        if (!loggedOut && !reconnectTimer) {
-          reconnectTimer = setTimeout(() => {
-            reconnectTimer = null;
-            startWhatsApp().catch(err => log("error", err.message));
-          }, 2500);
-        }
-
-        io.emit("state", snapshot());
-      }
+    log("success", "WhatsApp connection established", {
+      phone: state.phone
     });
+
+    io.emit("state", snapshot());
+  }
+
+  if (connection === "close") {
+    state.connected = false;
+    state.connecting = false;
+
+    const code = lastDisconnect?.error?.output?.statusCode;
+    const loggedOut = code === DisconnectReason.loggedOut;
+
+    log(
+      "warn",
+      loggedOut
+        ? "WhatsApp session logged out"
+        : "WhatsApp connection closed",
+      { code }
+    );
+
+    if (!loggedOut && !reconnectTimer) {
+      reconnectTimer = setTimeout(() => {
+        reconnectTimer = null;
+        startWhatsApp().catch(err => log("error", err.message));
+      }, 2500);
+    }
+
+    io.emit("state", snapshot());
+  }
+});
 
     sock.ev.on("messages.upsert", ({ messages }) => {
       for (const msg of messages) {
