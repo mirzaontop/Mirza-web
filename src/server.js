@@ -9,7 +9,7 @@ import { Server } from "socket.io";
 import makeWASocket, {
   DisconnectReason,
   useMultiFileAuthState,
-  fetchLatestBaileysVersion,
+  fetchLatestWaWebVersion,
   downloadMediaMessage
 } from "@whiskeysockets/baileys";
 
@@ -355,7 +355,7 @@ async function startWhatsApp(options = {}) {
 
   try {
     const { state: authState, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
-    const { version } = await fetchLatestBaileysVersion();
+    const { version } = await fetchLatestWaWebVersion();
 
     sock = makeWASocket({
       version,
