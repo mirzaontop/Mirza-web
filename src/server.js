@@ -21,7 +21,7 @@ const PORT = Number(process.env.PORT || 3000);
 const AUTH_DIR = path.join(__dirname, "..", "auth_info");
 
 app.use(express.json({ limit: "1mb" }));
-app.use(express.static(path.join(__dirname, "..", "public")));
+app.use(express.static(path.join(__dirname, "..")));
 
 const state = {
   connected: false,
