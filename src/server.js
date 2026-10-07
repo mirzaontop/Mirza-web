@@ -495,32 +495,65 @@ app.post("/api/disconnect", async (_, res) => {
 
 app.post("/api/pairing-code", async (req, res) => {
   try {
-    const raw = String(req.body?.phone || "").replace(/\\D/g, "");
+    const raw = String(req.body?.phone || "").replace(/\D/g, "");
+
     if (!raw || raw.length < 8 || raw.length > 15) {
-      return res.status(400).json({ error: "Enter your WhatsApp number with country code, e.g. 923001234567" });
+      return res.status(400).json({
+        error: "Enter your WhatsApp number with country code, e.g. 923001234567"
+      });
     }
 
     if (state.connected) {
-      return res.status(400).json({ error: "WhatsApp is already connected. Disconnect first." });
+      return res.status(400).json({
+        error: "WhatsApp is already connected. Disconnect first."
+      });
     }
 
-    if (state.connecting) {
-      if (state.pairingCode) return res.json({ ok: true, pairingCode: state.pairingCode });
-      return res.status(409).json({ error: "A connection attempt is already in progress. Wait a few seconds." });
+    // Stop any QR connection that is currently starting
+    if (state.connecting && sock) {
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+        reconnectTimer = null;
+      }
+
+      try {
+        sock.end();
+      } catch {}
+
+      sock = null;
+      state.connected = false;
+      state.connecting = false;
+      state.qr = null;
+      state.pairingCode = null;
+      state.pairingPhone = null;
     }
 
-    startWhatsApp({ pairingPhone: raw }).catch(err => log("error", err.message));
+    // Start a fresh pairing-code connection
+    await startWhatsApp({ pairingPhone: raw });
 
     const started = Date.now();
-    while (Date.now() - started < 10000) {
-      if (state.pairingCode) return res.json({ ok: true, pairingCode: state.pairingCode });
+
+    while (Date.now() - started < 15000) {
+      if (state.pairingCode) {
+        return res.json({
+          ok: true,
+          pairingCode: state.pairingCode
+        });
+      }
+
       await new Promise(resolve => setTimeout(resolve, 250));
     }
 
-    return res.status(504).json({ error: "Pairing code was not generated yet. Wait a few seconds and refresh." });
+    return res.status(504).json({
+      error: "Pairing code was not generated. Wait a few seconds and try again."
+    });
+
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({
+      error: err.message
+    });
   }
+});
 });
 
 app.post("/api/message", async (req, res) => {
