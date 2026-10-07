@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>LemonLeek WhatsApp Bot Panel</title>
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">◉</div>
+        <div><b>WhatsApp Bot Panel</b><small>Connect • Manage • Automate</small></div>
+      </div>
+      <nav>
+        <button class="nav active" data-section="dashboard">⌂ <span>Dashboard</span></button>
+        <button class="nav" data-section="messages">▢ <span>Messages</span></button>
+        <button class="nav" data-section="commands">⌘ <span>Bot Commands</span></button>
+        <button class="nav" data-section="logs">☷ <span>Logs</span></button>
+        <button class="nav" data-section="settings">⚙ <span>Settings</span></button>
+      </nav>
+      <div class="side-card">
+        <b>Fast • Secure • Reliable</b>
+        <span>Your WhatsApp bot, controlled from one place.</span>
+      </div>
+      <div class="status-card"><i></i><div><b>System Status</b><span id="systemStatus">Starting…</span></div></div>
+    </aside>
+
+    <main>
+      <header>
+        <div><h1 id="pageTitle">Dashboard</h1><p>WhatsApp automation control center</p></div>
+        <div class="online"><i></i><span id="topStatus">Offline</span></div>
+      </header>
+
+      <section id="dashboard" class="section active">
+        <div class="stats">
+          <article class="stat"><span>◉</span><div><small>WhatsApp</small><strong id="connectionStat">Offline</strong></div></article>
+          <article class="stat"><span>♟</span><div><small>Total Groups</small><strong id="groupsStat">0</strong></div></article>
+          <article class="stat"><span>●</span><div><small>Total Contacts</small><strong id="contactsStat">0</strong></div></article>
+          <article class="stat"><span>▤</span><div><small>Messages</small><strong id="messagesStat">0</strong></div></article>
+        </div>
+
+        <div class="grid">
+          <article class="panel connection">
+            <div class="panel-head"><div><h2>WhatsApp Connection</h2><p>Scan the QR code to connect your account.</p></div><button class="icon" id="refreshBtn">↻</button></div>
+            <div class="connect-body">
+              <div class="qr-wrap"><img id="qr" alt="WhatsApp QR"><span id="qrEmpty">QR will appear here</span></div>
+              <div class="connect-info">
+                <div class="pill" id="connectionPill"><i></i> Disconnected</div>
+                <p>Phone: <b id="phone">—</b></p>
+                <p>Session: <b id="session">Not connected</b></p>
+                <button class="primary" id="connectBtn">Connect WhatsApp</button>
+                <button class="danger" id="disconnectBtn">Disconnect</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head"><div><h2>Bot Control</h2><p>Manage your bot.</p></div></div>
+            <label class="switch-row"><span>Bot Status</span><input id="botToggle" type="checkbox" checked><i></i></label>
+            <button class="primary wide" id="restartBtn">↻ Restart Bot</button>
+            <button class="secondary wide" data-section-target="commands">⌘ Update Commands</button>
+            <button class="secondary wide" data-section-target="logs">▤ View Logs</button>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head"><div><h2>Quick Commands</h2><p>Test bot commands.</p></div></div>
+            <div class="commands">
+              <button data-command="/menu"><b>/menu</b><span>Show all commands</span></button>
+              <button data-command="/help"><b>/help</b><span>Get help</span></button>
+              <button data-command="/ping"><b>/ping</b><span>Check bot status</span></button>
+              <button data-command="/status"><b>/status</b><span>System status</span></button>
+            </div>
+          </article>
+        </div>
+
+        <div class="lower-grid">
+          <article class="panel chat-panel">
+            <div class="panel-head"><div><h2>Live Messages</h2><p>Real-time WhatsApp events.</p></div></div>
+            <div id="messages" class="messages"></div>
+            <form id="sendForm" class="composer">
+              <input id="to" placeholder="Recipient JID, e.g. 923001234567@s.whatsapp.net" required>
+              <input id="text" placeholder="Type a message…" required>
+              <button class="primary">Send</button>
+            </form>
+          </article>
+          <article class="panel">
+            <div class="panel-head"><div><h2>Bot Logs</h2><p>Latest activity.</p></div></div>
+            <div id="logs" class="logs"></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="messages" class="section"><div class="panel"><div class="panel-head"><div><h2>Messages</h2><p>Recent incoming and outgoing events.</p></div></div><div id="allMessages" class="table"></div></div></section>
+      <section id="commands" class="section"><div class="panel"><div class="panel-head"><div><h2>Bot Commands</h2><p>Built-in commands.</p></div></div><div class="command-list"><code>/menu</code><code>/help</code><code>/ping</code><code>/status</code></div></div></section>
+      <section id="logs" class="section"><div class="panel"><div class="panel-head"><div><h2>Logs</h2><p>Connection and bot activity.</p></div></div><div id="allLogs" class="logs tall"></div></div></section>
+      <section id="settings" class="section"><div class="panel settings"><div class="panel-head"><div><h2>Settings</h2><p>Configure your bot.</p></div></div>
+        <label>Bot name<input id="botName" value="LemonLeek Bot"></label>
+        <label>Command prefix<input id="prefix" value="/"></label>
+        <label class="switch-row"><span>Automatic replies</span><input id="autoReply" type="checkbox" checked><i></i></label>
+        <button class="primary" id="saveSettings">Save Settings</button>
+      </div></section>
+    </main>
+  </div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
