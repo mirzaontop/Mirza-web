@@ -3,3 +3,77 @@
 #pairingCode{font-size:30px;letter-spacing:4px;font-family:monospace}
 #pairingBox small{max-width:260px;line-height:1.5}
 #pairingPhone{width:100%;box-sizing:border-box;padding:12px;border:1px solid #ddd;border-radius:10px}
+/* MIRZA HERO ANIMATION */
+.hero-header {
+  position: relative;
+  overflow: hidden;
+  padding: 28px 24px;
+  border-radius: 22px;
+  animation: heroGlow 3s ease-in-out infinite;
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+
+.hero-badge {
+  display: inline-block;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.15);
+  animation: badgeFloat 2.5s ease-in-out infinite;
+}
+
+.hero-header h1
+  margin: 12px 0 4px;
+  font-size: clamp(42px, 9vw, 76px);
+  font-weight: 900;
+  letter-spacing: 5px;
+  background: linear-gradient(90deg, #fff, #9f9f9f, #fff);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textShine 3s linear infinite;
+}
+
+.hero-header p {
+  margin: 0;
+  opacity: .75;
+  font-size: 15px;
+}
+
+.hero-header small {
+  opacity: .55;
+  letter-spacing: 2px;
+}
+
+.hero-line {
+  width: 90px;
+  height: 3px;
+  margin: 14px 0;
+  border-radius: 10px;
+  background: currentColor;
+  animation: linePulse 2s ease-in-out infinite;
+}
+
+@keyframes heroGlow {
+  0%, 100% { box-shadow: 0 0 0 rgba(255,255,255,0); }
+  50% { box-shadow: 0 0 35px rgba(255,255,255,.12); }
+}
+
+@keyframes badgeFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes textShine {
+  to { background-position: 200% center; }
+}
+
+@keyframes linePulse {
+  0%, 100% { width: 60px; opacity: .5; }
+  50% { width: 120px; opacity: 1; }
+  }
