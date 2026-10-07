@@ -358,40 +358,51 @@ async function startWhatsApp(options = {}) {
     const { version } = await fetchLatestWaWebVersion();
 
     sock = makeWASocket({
-      version,
-      auth: authState,
-      logger: pino({ level: "silent" }),
-      browser: ["LemonLeek Panel", "Chrome", "1.0.0"],
-      markOnlineOnConnect: false,
-      generateHighQualityLinkPreview: false
+  version,
+  auth: authState,
+  logger: pino({ level: "silent" }),
+  browser: ["LemonLeek Panel", "Chrome", "1.0.0"],
+  markOnlineOnConnect: false,
+  generateHighQualityLinkPreview: false
+});
+
+sock.ev.on("creds.update", saveCreds);
+
+sock.ev.on("connection.update", async (update) => {
+  const { connection, lastDisconnect, qr } = update;
+
+  if (
+    state.loginMode === "pairing" &&
+    state.pairingPhone &&
+    !authState.creds.registered &&
+    (connection === "connecting" || qr)
+  ) {
+    try {
+      const code = await sock.requestPairingCode(state.pairingPhone);
+
+      state.pairingCode =
+        String(code || "").match(/.{1,4}/g)?.join("-") ||
+        String(code || "");
+
+      state.connecting = true;
+      log("success", "WhatsApp pairing code generated");
+      io.emit("state", snapshot());
+    } catch (err) {
+      state.pairingCode = null;
+      log("error", `Pairing code failed: ${err.message}`);
+      io.emit("state", snapshot());
+    }
+  }
+
+  if (qr && state.loginMode === "qr") {
+    state.qr = await QRCode.toDataURL(qr, {
+      margin: 1,
+      width: 320
     });
 
-    sock.ev.on("creds.update", saveCreds);
-
-    if (state.loginMode === "pairing" && state.pairingPhone && !authState.creds.registered) {
-      setTimeout(async () => {
-        try {
-          const code = await sock.requestPairingCode(state.pairingPhone);
-          state.pairingCode = String(code || "").match(/.{1,4}/g)?.join("-") || String(code || "");
-          state.connecting = true;
-          log("success", "WhatsApp pairing code generated");
-          io.emit("state", snapshot());
-        } catch (err) {
-          state.pairingCode = null;
-          log("error", `Pairing code failed: ${err.message}`);
-          io.emit("state", snapshot());
-        }
-      }, 1500);
-    }
-
-    sock.ev.on("connection.update", async (update) => {
-      const { connection, lastDisconnect, qr } = update;
-
-      if (qr && state.loginMode === "qr") {
-        state.qr = await QRCode.toDataURL(qr, { margin: 1, width: 320 });
-        log("info", "New WhatsApp QR generated");
-        io.emit("state", snapshot());
-      }
+    log("info", "New WhatsApp QR generated");
+    io.emit("state", snapshot());
+  }
 
       if (connection === "open") {
         state.connected = true;
