@@ -438,7 +438,8 @@ sock.ev.on("connection.update", async (update) => {
     if (!loggedOut && !reconnectTimer) {
       reconnectTimer = setTimeout(() => {
         reconnectTimer = null;
-        startWhatsApp().catch(err => log("error", err.message));
+        startWhatsApp({ pairingPhone: state.pairingPhone })
+  .catch(err => log("error", err.message));
       }, 2500);
     }
 
