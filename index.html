@@ -148,5 +148,18 @@
   </div>
   <script src="/socket.io/socket.io.js"></script>
   <script src="/app.js"></script>
+  <audio id="bgMusic" autoplay loop>
+  <source src="/FLY%20SONIYE.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+  window.addEventListener("load", function () {
+    const music = document.getElementById("bgMusic");
+
+    music.play().catch(function () {
+      console.log("Autoplay blocked by browser");
+    });
+  });
+</script>
 </body>
 </html>
