@@ -8,7 +8,7 @@
     "dev": "node --watch src/server.js"
   },
   "dependencies": {
-    "@whiskeysockets/baileys": "^6.7.20",
+    "@whiskeysockets/baileys": "6.7.23",
     "express": "^5.1.0",
     "pino": "^9.7.0",
     "qrcode": "^1.5.4",
