@@ -394,6 +394,7 @@ if (
 
 sock.ev.on("connection.update", async (update) => {
   const { connection, lastDisconnect, qr } = update;
+  log("info", `WhatsApp update: ${JSON.stringify(update)}`);
 
   if (qr && state.loginMode === "qr") {
     state.qr = await QRCode.toDataURL(qr, {
