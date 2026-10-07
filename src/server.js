@@ -554,7 +554,6 @@ app.post("/api/pairing-code", async (req, res) => {
     });
   }
 });
-});
 
 app.post("/api/message", async (req, res) => {
   try {
